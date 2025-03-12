@@ -3,7 +3,7 @@
 	This problem requires you to implement a basic interface for a binary tree
 */
 
-//I AM NOT DONE
+
 use std::cmp::Ordering;
 use std::fmt::Debug;
 
@@ -11,11 +11,11 @@ use std::fmt::Debug;
 #[derive(Debug)]
 struct TreeNode<T>
 where
-    T: Ord,
+    T: Ord, // 实现 Ord trait 可比较大小
 {
     value: T,
-    left: Option<Box<TreeNode<T>>>,
-    right: Option<Box<TreeNode<T>>>,
+    left: Option<Box<TreeNode<T>>>, // 可能存在的左子树
+    right: Option<Box<TreeNode<T>>>, // 可能存在的右子树
 }
 
 #[derive(Debug)]
@@ -23,7 +23,7 @@ struct BinarySearchTree<T>
 where
     T: Ord,
 {
-    root: Option<Box<TreeNode<T>>>,
+    root: Option<Box<TreeNode<T>>>, // 可能存在的根节点
 }
 
 impl<T> TreeNode<T>
@@ -50,13 +50,24 @@ where
 
     // Insert a value into the BST
     fn insert(&mut self, value: T) {
-        //TODO
+        if let Some(ref mut root_node) = self.root {
+            root_node.insert(value);
+        } else {
+            self.root = Some(Box::new(TreeNode::new(value)));
+        }
     }
 
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
-        //TODO
-        true
+        let mut current = &self.root;
+        while let Some(node) = current {
+            match value.cmp(&node.value) {
+                Ordering::Less => current = &node.left,
+                Ordering::Greater => current = &node.right,
+                Ordering::Equal => return true,
+            }
+        }
+        false
     }
 }
 
@@ -66,10 +77,25 @@ where
 {
     // Insert a node into the tree
     fn insert(&mut self, value: T) {
-        //TODO
+        match value.cmp(&self.value) {
+            Ordering::Less => {
+                if let Some(ref mut left_child) = self.left {
+                    left_child.insert(value);
+                } else {
+                    self.left = Some(Box::new(TreeNode::new(value)));
+                }
+            }
+            Ordering::Greater => {
+                if let Some(ref mut right_child) = self.right {
+                    right_child.insert(value);
+                } else {
+                    self.right = Some(Box::new(TreeNode::new(value)));
+                }
+            }
+            Ordering::Equal => {} // 忽略重复值
+        }
     }
 }
-
 
 #[cfg(test)]
 mod tests {
